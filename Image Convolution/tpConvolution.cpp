@@ -87,7 +87,6 @@ Mat convolution(Mat image, cv::Mat kernel)
             res.at<uchar>(i, j) = static_cast<uchar>(val);
         }
     }
-
     /********************************************
                 END OF YOUR CODE
     *********************************************/
@@ -95,43 +94,64 @@ Mat convolution(Mat image, cv::Mat kernel)
     return res;
 }
 
+
 /**
-    Compute the sum of absolute partial derivative according to Sobel's method
+    Compute a median filter of the input float image.
+    The filter window is a square of (2*size+1)*(2*size+1) pixels.
+
+    Values outside image domain are ignored.
+
+    The median of a list l of n>2 elements is defined as:
+     - l[n/2] if n is odd
+     - (l[n/2-1]+l[n/2])/2 is n is even
 */
-cv::Mat edgeSobel(cv::Mat image)
+
+Mat median(Mat image, int size)
 {
     Mat res = image.clone();
+    assert(size > 0);
     /********************************************
                 YOUR CODE HERE
     *********************************************/
-    
-    /********************************************
-                END OF YOUR CODE
-    *********************************************/
-    return res;
-}
 
-/**
-    Value of a centered gaussian of variance (scale) sigma at point x.
-*/
-float gaussian(float x, float sigma2)
-{
-    /*1.0 / (2 * M_PI * sigma2) * exp(-x * x / (2 * sigma2))*/
-    return 1.0 / (2  * sigma2) * exp(-x * x / (2 * sigma2));
-}
+    int rows = image.rows;
+    int cols = image.cols;
 
-/**
-    Performs a bilateral filter with the given spatial smoothing kernel 
-    and a intensity smoothing of scale sigma_r.
 
-*/
-cv::Mat bilateralFilter(cv::Mat image, cv::Mat kernel, float sigma_r)
-{
-    Mat res = image.clone();
-    /********************************************
-                YOUR CODE HERE
-    *********************************************/
-   
+    // Pad the image
+    int borderSize = size;
+    cv::Mat paddedImage(rows + 2 * borderSize, cols + 2 * borderSize, CV_8U);
+    cv::copyMakeBorder(image, paddedImage, borderSize, borderSize, borderSize, borderSize, cv::BORDER_REFLECT);
+
+    // Iterate over the image pixels
+    for (int i = borderSize; i < rows + borderSize; ++i) {
+        for (int j = borderSize; j < cols + borderSize; ++j) {
+            // Extract pixel values in the window
+            std::vector<uchar> windowValues;
+            for (int m = i-size; m <= i+size; m++) {
+                for (int n = j-size; n <= j+size; n++) {
+                    windowValues.push_back(paddedImage.at<uchar>(m,n));
+                }
+            }
+
+            // Sort the window values
+            std::sort(windowValues.begin(), windowValues.end());
+
+            // Calculate the median
+            int n = windowValues.size();
+            float medianValue;
+            if (n % 2 == 0) {
+                medianValue = (windowValues[n / 2 - 1] + windowValues[n / 2]) / 2.0f;
+            }
+            else {
+                medianValue = windowValues[n / 2];
+            }
+
+            // Assign the median to the resulting image
+            res.at<uchar>(i - borderSize, j - borderSize) = medianValue;
+        }
+    }
+
     /********************************************
                 END OF YOUR CODE
     *********************************************/
