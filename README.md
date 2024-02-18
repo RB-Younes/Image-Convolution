@@ -1,6 +1,6 @@
 # Image Convolution
 
-This TP 03 Convolution includes several functions implemented for image processing, including convolution filters such as the mean filter and the median filter.
+This repository includes several functions implemented for image processing, including convolution filters such as the mean filter and the median filter.
 
 ## Mean Filter (`meanFilter`)
 
@@ -20,3 +20,4 @@ The `median` function calculates a median filter of a float image. This filter i
 ---
 
 This Project provides basic functionalities for image processing, providing tools for filtering, smoothing, and enhancing images using convolution techniques.
+These functions are designed for educational purposes and may require further optimization or customization for specific applications.
